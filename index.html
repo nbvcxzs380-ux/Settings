@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#102a43">
+<title>رفيق الشهادة السودانية</title>
+<link rel="manifest" href="manifest.json">
+<style>
+:root{--navy:#102a43;--blue:#176b87;--gold:#f4c95d;--bg:#f3f6fa;--card:#fff;--text:#14212b;--muted:#617384}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Tahoma,Arial,sans-serif;line-height:1.6}
+header{background:linear-gradient(135deg,var(--navy),var(--blue));color:white;padding:22px 18px 18px;border-radius:0 0 24px 24px}
+header h1{margin:0;font-size:25px}header p{margin:6px 0 14px;color:#e2edf3}
+.pill{display:inline-block;background:#ffffff20;border:1px solid #ffffff50;border-radius:30px;padding:5px 11px;font-size:12px}
+main{max-width:850px;margin:auto;padding:14px 12px 90px}
+.search{display:flex;gap:8px;margin:14px 0}.search input{flex:1;min-width:0}
+input,select,textarea{font:inherit;border:1px solid #d5dee7;border-radius:12px;padding:12px;background:white;width:100%}
+nav{position:fixed;bottom:0;left:0;right:0;background:white;box-shadow:0 -4px 20px #102a4314;display:flex;justify-content:space-around;padding:8px 3px calc(8px + env(safe-area-inset-bottom));z-index:5}
+nav button{border:0;background:transparent;color:var(--muted);font-size:12px;padding:5px;flex:1}
+nav button.active{color:var(--blue);font-weight:bold}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.card{background:var(--card);border:1px solid #e5ebf0;border-radius:16px;padding:14px;margin:10px 0;box-shadow:0 3px 12px #102a4308}
+.grid .card{margin:0;cursor:pointer}.card h3{margin:4px 0 5px;font-size:16px}.muted{color:var(--muted);font-size:13px}
+button,.btn{background:var(--blue);color:white;border:0;border-radius:12px;padding:11px 14px;font:inherit;cursor:pointer}
+button.secondary{background:#e8f2f6;color:var(--navy)}button.gold{background:var(--gold);color:#31280c}
+.section-title{display:flex;align-items:center;justify-content:space-between;margin-top:20px}
+.tag{background:#e9f5f7;color:#176b87;padding:3px 8px;border-radius:20px;font-size:12px}
+.answer{display:block;width:100%;text-align:right;margin:8px 0;background:#f0f4f8;color:#1c3444;border:1px solid #dce5eb}
+.answer.selected{border-color:var(--blue);background:#dff3f7}.answer.correct{background:#dff5e5;border-color:#58a66d}.answer.wrong{background:#ffe5e5;border-color:#d96b6b}
+.hidden{display:none!important}.row{display:flex;gap:8px;align-items:center}.row>*{flex:1}.progress{height:8px;background:#e2e9ef;border-radius:9px;overflow:hidden}.progress span{display:block;height:100%;background:#2d9c79;width:0}
+footer{text-align:center;color:var(--muted);font-size:12px;margin:25px}
+@media(min-width:650px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+</style>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+<header>
+ <div class="pill">منصتك المجانية للمراجعة</div>
+ <h1>🎓 رفيق الشهادة السودانية</h1>
+ <p>دروس مختصرة • بنك أسئلة • امتحانات تجريبية</p>
+ <div class="row"><div><strong id="hello">أهلًا يا طالب</strong><div class="muted" style="color:#d8e9ef">خطوة كل يوم تقرّبك للنجاح</div></div><div style="text-align:left"><span class="pill">الصف الثالث الثانوي</span></div></div>
+</header>
+<main>
+ <section id="home">
+  <div class="search"><input id="searchAll" placeholder="ابحث عن مادة أو درس أو سؤال..."><button onclick="searchEverything()">بحث</button></div>
+  <div class="grid">
+   <div class="card" onclick="showTab('subjects')"><div style="font-size:27px">📚</div><h3>المواد الدراسية</h3><div class="muted">اختر مادة وابدأ المراجعة</div></div>
+   <div class="card" onclick="showTab('questions')"><div style="font-size:27px">🧠</div><h3>بنك الأسئلة</h3><div class="muted">تدرب وصحح إجاباتك</div></div>
+   <div class="card" onclick="showTab('exams')"><div style="font-size:27px">📝</div><h3>امتحانات تجريبية</h3><div class="muted">اختبر مستواك</div></div>
+   <div class="card" onclick="showTab('lessons')"><div style="font-size:27px">🎬</div><h3>الدروس</h3><div class="muted">ملخصات وروابط شرح</div></div>
+  </div>
+  <div class="section-title"><h2>خطة اليوم</h2><span class="tag">ابدأ الآن</span></div>
+  <div class="card"><strong>⏱️ 25 دقيقة تركيز</strong><p class="muted">راجع درسًا واحدًا، حل 5 أسئلة، ثم سجل ما تحتاج إلى مراجعته.</p><div class="progress"><span id="dailyProgress"></span></div><button class="secondary" onclick="markDaily()">تم إنجاز جلسة اليوم ✓</button></div>
+  <div class="card"><h3>📢 تنبيه مهم</h3><p class="muted">المحتوى الحالي نموذج تدريبي أولي. راجع المنهج الرسمي وآخر التعديلات الصادرة عن وزارة التربية والتعليم، وأضف الكتب والأسئلة المعتمدة قبل الاعتماد عليه للمذاكرة النهائية.</p></div>
+ </section>
+ <section id="subjects" class="hidden"><h2>المواد الدراسية</h2><p class="muted">قائمة بداية قابلة للتعديل حسب المساق والمنهج الرسمي.</p><div id="subjectList" class="grid"></div></section>
+ <section id="lessons" class="hidden"><h2>الدروس والملخصات</h2><select id="lessonSubject" onchange="renderLessons()"><option value="الكل">كل المواد</option></select><div id="lessonList"></div></section>
+ <section id="questions" class="hidden"><h2>بنك الأسئلة</h2><div class="row"><select id="questionSubject" onchange="renderQuestions()"><option value="الكل">كل المواد</option></select><select id="questionLevel" onchange="renderQuestions()"><option value="الكل">كل المستويات</option><option>أساسي</option><option>متوسط</option><option>متقدم</option></select></div><div id="questionList"></div></section>
+ <section id="exams" class="hidden"><h2>امتحانات تجريبية</h2><div class="card"><p>اختر امتحانًا قصيرًا من الأسئلة الموجودة في النموذج.</p><label>المادة</label><select id="examSubject"><option value="الكل">كل المواد</option></select><label style="display:block;margin-top:10px">عدد الأسئلة</label><select id="examCount"><option>5</option><option>10</option><option>15</option></select><button style="margin-top:12px;width:100%" onclick="startExam()">ابدأ الامتحان</button></div><div id="examArea"></div></section>
+ <section id="account" class="hidden"><h2>حساب الطالب</h2><div class="card"><label>اسمك (اختياري)</label><input id="studentName" placeholder="اكتب اسمك"><button onclick="saveName()" style="margin-top:10px">حفظ الاسم</button><hr style="border:0;border-top:1px solid #e5ebf0;margin:18px 0"><h3>الاشتراك</h3><span class="tag">مجاني حاليًا</span><p class="muted">تم تصميم النموذج ليكون مجانيًا. يمكن إضافة اشتراكات مستقبلًا بعد تجهيز خادم وقاعدة بيانات ودفع آمن.</p><button class="secondary" onclick="showTab('home')">العودة للرئيسية</button></div><div class="card"><h3>تقدمك على هذا الجهاز</h3><p id="stats" class="muted">لم تبدأ بعد.</p><button class="secondary" onclick="resetProgress()">إعادة ضبط التقدم المحلي</button></div></section>
+ <section id="admin" class="hidden"><h2>إدارة المحتوى التجريبية</h2><div class="card"><p class="muted">هذه لوحة محلية على جهازك فقط، وليست لوحة آمنة لإدارة منصة عامة. البيانات التي تضيفها لا تظهر تلقائيًا للطلاب الآخرين.</p><label>نوع المحتوى</label><select id="newType"><option value="lesson">درس أو رابط شرح</option><option value="question">سؤال اختيار من متعدد</option></select><label style="display:block;margin-top:10px">المادة</label><select id="newSubject"></select><label style="display:block;margin-top:10px">العنوان أو نص السؤال</label><textarea id="newTitle" rows="2"></textarea><div id="questionFields"><label>الخيار أ</label><input id="opt0"><label>الخيار ب</label><input id="opt1"><label>الخيار ج</label><input id="opt2"><label>الخيار د</label><input id="opt3"><label>رقم الإجابة الصحيحة (0 إلى 3)</label><input id="correct" type="number" min="0" max="3" value="0"></div><label style="display:block;margin-top:10px">رابط (اختياري)</label><input id="newUrl" placeholder="https://..."><button style="margin-top:12px;width:100%" onclick="addContent()">إضافة للمحتوى المحلي</button></div></section>
+ <footer>رفيق الشهادة السودانية • نموذج تجريبي مجاني</footer>
+</main>
+<nav>
+ <button class="active" data-tab="home" onclick="showTab('home')">🏠<br>الرئيسية</button>
+ <button data-tab="subjects" onclick="showTab('subjects')">📚<br>المواد</button>
+ <button data-tab="questions" onclick="showTab('questions')">🧠<br>الأسئلة</button>
+ <button data-tab="exams" onclick="showTab('exams')">📝<br>الامتحان</button>
+ <button data-tab="account" onclick="showTab('account')">👤<br>حسابي</button>
+</nav>
+<script>
+const subjects=["اللغة العربية","اللغة الإنجليزية","التربية الإسلامية","الرياضيات المتخصصة","الرياضيات الأساسية","الفيزياء","الكيمياء","الأحياء","الجغرافيا","التاريخ","علوم الحاسوب","العلوم الهندسية","المحاسبة","الدراسات التجارية"];
+const lessons=[
+ {s:"اللغة العربية",t:"مهارات الفهم القرائي",d:"اقرأ النص مرتين: الأولى للفكرة العامة، والثانية لتحديد الأدلة والكلمات المفتاحية. أجب من النص ولا تعتمد على التخمين.",u:""},
+ {s:"اللغة الإنجليزية",t:"Reading comprehension: strategy",d:"Read the questions first, scan for keywords, then read the relevant paragraph carefully. Check tense and pronoun references.",u:""},
+ {s:"التربية الإسلامية",t:"منهجية مراجعة النصوص",d:"راجع معنى النص، المفردات، الفكرة الأساسية، والدروس المستفادة. ارجع إلى الكتاب المدرسي للتأكد من النصوص المقررة.",u:""},
+ {s:"الرياضيات الأساسية",t:"خطوات حل المسألة",d:"اكتب المعطيات، وحدد المطلوب، واختر القانون المناسب، ثم عوّض وتحقق من الوحدات وصحة الناتج.",u:""},
+ {s:"الفيزياء",t:"تحليل المسائل الفيزيائية",d:"ارسم مخططًا بسيطًا، وحوّل الوحدات إلى النظام الدولي، ثم اكتب القانون قبل التعويض العددي.",u:""},
+ {s:"الكيمياء",t:"موازنة المعادلات الكيميائية",d:"احسب عدد ذرات كل عنصر في الطرفين، وغيّر المعاملات فقط دون تغيير الصيغ الكيميائية.",u:""},
+ {s:"الأحياء",t:"تنظيم المصطلحات",d:"استخدم جدولًا للمصطلح والتعريف والوظيفة والمثال، ثم اختبر نفسك دون النظر إلى الكتاب.",u:""},
+ {s:"التاريخ",t:"بناء خط زمني",d:"رتب الأحداث زمنيًا، واربط كل حدث بالأسباب والنتائج والشخصيات والمصطلحات الأساسية.",u:""},
+ {s:"الجغرافيا",t:"قراءة الخرائط",d:"راجع عنوان الخريطة والمفتاح ومقياس الرسم والاتجاهات، ثم اربط الظاهرة بموقعها وأسبابها.",u:""},
+ {s:"علوم الحاسوب",t:"التفكير الخوارزمي",d:"قسّم المشكلة إلى مدخلات ومعالجة ومخرجات، واكتب الخطوات بترتيب واضح قبل تحويلها إلى برنامج.",u:""}
+];
+const questions=[
+ {s:"اللغة العربية",l:"أساسي",q:"ما أفضل خطوة أولى لفهم نص جديد؟",o:["حفظه كاملًا","قراءة الفكرة العامة","تجاهل العنوان","اختيار إجابة عشوائية"],a:1,e:"ابدأ بالفكرة العامة ثم ارجع للتفاصيل."},
+ {s:"اللغة الإنجليزية",l:"أساسي",q:"Choose the correct plural of “child”.",o:["childs","childes","children","childrens"],a:2,e:"The plural form is children."},
+ {s:"الرياضيات الأساسية",l:"أساسي",q:"إذا كان 3x = 12، فإن x يساوي:",o:["3","4","9","15"],a:1,e:"نقسم الطرفين على 3 فنحصل على x = 4."},
+ {s:"الفيزياء",l:"متوسط",q:"ما وحدة قياس القوة في النظام الدولي؟",o:["الجول","الواط","النيوتن","الأمبير"],a:2,e:"وحدة القوة هي النيوتن."},
+ {s:"الكيمياء",l:"أساسي",q:"الرمز الكيميائي للأكسجين هو:",o:["Ox","O","Og","Om"],a:1,e:"يرمز للأكسجين بالحرف O."},
+ {s:"الأحياء",l:"أساسي",q:"أي جزء من الخلية يحتوي عادةً على المادة الوراثية في الخلايا حقيقية النواة؟",o:["النواة","الجدار الخلوي","الفجوة فقط","الغشاء الخارجي فقط"],a:0,e:"توجد معظم المادة الوراثية في النواة."},
+ {s:"التربية الإسلامية",l:"متوسط",q:"عند مراجعة نص مقرر، ما المرجع الأدق للتحقق من صياغته؟",o:["منشور مجهول","الكتاب المدرسي المعتمد","تعليق غير موثق","التخمين"],a:1,e:"ارجع إلى الكتاب المدرسي المعتمد."},
+ {s:"التاريخ",l:"متوسط",q:"ما فائدة الخط الزمني في دراسة التاريخ؟",o:["إخفاء ترتيب الأحداث","ترتيب الأحداث حسب الزمن","استبدال المصادر","حذف الأسباب"],a:1,e:"يساعد على فهم تسلسل الأحداث."},
+ {s:"الجغرافيا",l:"أساسي",q:"أي عنصر يساعد على تفسير الرموز في الخريطة؟",o:["مفتاح الخريطة","رقم الصفحة","اسم المؤلف فقط","لون الغلاف"],a:0,e:"مفتاح الخريطة يشرح الرموز المستخدمة."},
+ {s:"علوم الحاسوب",l:"متوسط",q:"تتكون الخوارزمية الجيدة من:",o:["خطوات مرتبة وواضحة","كلمات عشوائية","نتيجة دون خطوات","صور فقط"],a:0,e:"الخوارزمية سلسلة خطوات واضحة لحل مشكلة."},
+ {s:"الرياضيات المتخصصة",l:"متوسط",q:"مشتقة الدالة f(x)=x² هي:",o:["x","2x","x³","2"],a:1,e:"باستخدام قاعدة القوة: مشتقة x² تساوي 2x."},
+ {s:"اللغة العربية",l:"متقدم",q:"أي مما يلي يساعد على دعم إجابة الفهم القرائي؟",o:["دليل من النص","رأي بعيد عن النص","التكرار دون دليل","ترك السؤال"],a:0,e:"استشهد بما ورد في النص لدعم الإجابة."}
+];
+let customLessons=JSON.parse(localStorage.getItem("rafiq_lessons")||"[]"), customQuestions=JSON.parse(localStorage.getItem("rafiq_questions")||"[]");
+let allLessons=[...lessons,...customLessons], allQuestions=[...questions,...customQuestions], examState=null, answered=0, correctTotal=0;
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function showTab(id){document.querySelectorAll("main section").forEach(s=>s.classList.add("hidden"));document.getElementById(id).classList.remove("hidden");document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.tab===id));if(id==="subjects")renderSubjects();if(id==="lessons")renderLessons();if(id==="questions")renderQuestions();if(id==="account")renderStats();window.scrollTo(0,0)}
+function fillSelects(){["lessonSubject","questionSubject","examSubject","newSubject"].forEach(id=>{let el=document.getElementById(id);let first=el.options[0]?.outerHTML||"";el.innerHTML=first+subjects.map(s=>`<option>${esc(s)}</option>`).join("")})}
+function renderSubjects(){document.getElementById("subjectList").innerHTML=subjects.map((s,i)=>`<div class="card" onclick="openSubject('${esc(s)}')"><div style="font-size:24px">${["📖","🌐","🕌","➗","🔢","⚡","🧪","🧬","🌍","🏺","💻","⚙️","📊","💼"][i%14]}</div><h3>${esc(s)}</h3><div class="muted">${allLessons.filter(x=>x.s===s).length} درس • ${allQuestions.filter(x=>x.s===s).length} سؤال تجريبي</div></div>`).join("")}
+function openSubject(s){document.getElementById("lessonSubject").value=s;showTab("lessons");renderLessons()}
+function renderLessons(){let s=document.getElementById("lessonSubject").value;let a=allLessons.filter(x=>s==="الكل"||x.s===s);document.getElementById("lessonList").innerHTML=a.map(x=>`<div class="card"><span class="tag">${esc(x.s)}</span><h3>${esc(x.t)}</h3><p>${esc(x.d||"")}</p>${x.u?`<a href="${esc(x.u)}" target="_blank" rel="noopener">فتح رابط الدرس</a>`:""}</div>`).join("")||"<p>لا توجد دروس لهذه المادة بعد.</p>"}
+function renderQuestions(){let s=document.getElementById("questionSubject").value,l=document.getElementById("questionLevel").value;let a=allQuestions.filter(x=>(s==="الكل"||x.s===s)&&(l==="الكل"||x.l===l));document.getElementById("questionList").innerHTML=a.map((x,i)=>`<div class="card"><span class="tag">${esc(x.s)} • ${esc(x.l||"أساسي")}</span><h3>${esc(x.q)}</h3>${x.o.map((o,j)=>`<button class="answer" onclick="checkAnswer(this,${j},${x.a},'explain${i}')">${"أ ب ج د"[j]}. ${esc(o)}</button>`).join("")}<p id="explain${i}" class="muted hidden">${esc(x.e||"")}</p></div>`).join("")||"<p>لا توجد أسئلة مطابقة.</p>"}
+function checkAnswer(btn,j,a,exp){let box=btn.parentElement;box.querySelectorAll(".answer").forEach((b,i)=>{b.disabled=true;if(i===a)b.classList.add("correct")});if(j!==a)btn.classList.add("wrong");document.getElementById(exp).classList.remove("hidden");answered++;if(j===a)correctTotal++;localStorage.setItem("rafiq_answered",answered);localStorage.setItem("rafiq_correct",correctTotal);renderStats()}
+function startExam(){let s=document.getElementById("examSubject").value,n=+document.getElementById("examCount").value;let pool=allQuestions.filter(q=>s==="الكل"||q.s===s);pool.sort(()=>Math.random()-.5);examState={items:pool.slice(0,Math.min(n,pool.length)),i:0,score:0};renderExamQuestion()}
+function renderExamQuestion(){let area=document.getElementById("examArea");if(!examState||!examState.items.length){area.innerHTML='<div class="card">لا توجد أسئلة لهذه المادة بعد. جرّب مادة أخرى أو أضف أسئلة من لوحة الإدارة.</div>';return}if(examState.i>=examState.items.length){area.innerHTML=`<div class="card"><h3>انتهى الامتحان 🎉</h3><h2>${examState.score} / ${examState.items.length}</h2><p>نتيجتك التجريبية. راجع الإجابات الخاطئة وارجع للكتاب المدرسي.</p><button onclick="startExam()">إعادة الامتحان</button></div>`;return}let q=examState.items[examState.i];area.innerHTML=`<div class="card"><div class="muted">السؤال ${examState.i+1} من ${examState.items.length}</div><div class="progress"><span style="width:${examState.i/examState.items.length*100}%"></span></div><h3>${esc(q.q)}</h3>${q.o.map((o,j)=>`<button class="answer" onclick="answerExam(${j})">${"أ ب ج د"[j]}. ${esc(o)}</button>`).join("")}</div>`}
+function answerExam(j){let q=examState.items[examState.i],bs=document.querySelectorAll("#examArea .answer");bs.forEach((b,i)=>{b.disabled=true;if(i===q.a)b.classList.add("correct")});if(j!==q.a)bs[j].classList.add("wrong");else examState.score++;let d=document.createElement("p");d.className="muted";d.textContent=q.e||"";document.querySelector("#examArea .card").appendChild(d);let next=document.createElement("button");next.textContent="السؤال التالي";next.style.marginTop="8px";next.onclick=()=>{examState.i++;renderExamQuestion()};document.querySelector("#examArea .card").appendChild(next)}
+function searchEverything(){let q=document.getElementById("searchAll").value.trim().toLowerCase();if(!q)return;let hit=allLessons.find(x=>(x.t+" "+x.s+" "+x.d).toLowerCase().includes(q));let que=allQuestions.find(x=>(x.q+" "+x.s).toLowerCase().includes(q));if(hit){document.getElementById("lessonSubject").value=hit.s;showTab("lessons")}else showTab("questions");if(que){document.getElementById("questionSubject").value=que.s;renderQuestions()}else if(hit)renderLessons();else document.getElementById("questionList").innerHTML="<div class='card'>لا توجد نتيجة مطابقة. جرّب كلمة أخرى.</div>"}
+function markDaily(){localStorage.setItem("rafiq_daily",new Date().toDateString());document.getElementById("dailyProgress").style.width="100%";alert("أحسنت! تم تسجيل إنجاز اليوم على هذا الجهاز.")}
+function saveName(){let n=document.getElementById("studentName").value.trim();localStorage.setItem("rafiq_name",n);document.getElementById("hello").textContent=n?"أهلًا يا "+n:"أهلًا يا طالب";alert("تم حفظ الاسم على هذا الجهاز.")}
+function renderStats(){answered=+(localStorage.getItem("rafiq_answered")||0);correctTotal=+(localStorage.getItem("rafiq_correct")||0);document.getElementById("stats").textContent=`أجبت عن ${answered} سؤالًا في التدريب، منها ${correctTotal} إجابة صحيحة.`}
+function resetProgress(){if(confirm("هل تريد مسح تقدم التدريب المحلي؟")){localStorage.removeItem("rafiq_answered");localStorage.removeItem("rafiq_correct");localStorage.removeItem("rafiq_daily");renderStats()}}
+function addContent(){let type=document.getElementById("newType").value,s=document.getElementById("newSubject").value,t=document.getElementById("newTitle").value.trim(),u=document.getElementById("newUrl").value.trim();if(!t){alert("اكتب العنوان أو السؤال أولًا.");return}if(type==="lesson"){customLessons.push({s,t,d:"درس أضافه مدير المحتوى محليًا.",u});localStorage.setItem("rafiq_lessons",JSON.stringify(customLessons));allLessons=[...lessons,...customLessons];alert("تمت إضافة الدرس على هذا الجهاز.")}else{let o=[0,1,2,3].map(i=>document.getElementById("opt"+i).value.trim());if(o.some(x=>!x)){alert("أكمل الخيارات الأربعة.");return}let a=Math.max(0,Math.min(3,+document.getElementById("correct").value||0));customQuestions.push({s,l:"أساسي",q:t,o,a,e:"راجع الإجابة في المنهج المعتمد."});localStorage.setItem("rafiq_questions",JSON.stringify(customQuestions));allQuestions=[...questions,...customQuestions];alert("تمت إضافة السؤال على هذا الجهاز.")}document.getElementById("newTitle").value="";renderSubjects()}
+document.getElementById("newType").addEventListener("change",()=>document.getElementById("questionFields").classList.toggle("hidden",document.getElementById("newType").value!=="question"));
+(function init(){fillSelects();renderSubjects();if(localStorage.getItem("rafiq_name")){document.getElementById("hello").textContent="أهلًا يا "+localStorage.getItem("rafiq_name");document.getElementById("studentName").value=localStorage.getItem("rafiq_name")}if(localStorage.getItem("rafiq_daily")===new Date().toDateString())document.getElementById("dailyProgress").style.width="100%";let tg=window.Telegram?.WebApp;if(tg){tg.ready();tg.expand();if(tg.initDataUnsafe?.user?.first_name){document.getElementById("hello").textContent="أهلًا يا "+tg.initDataUnsafe.user.first_name}}renderStats()})();
+</script>
+</body></html>
